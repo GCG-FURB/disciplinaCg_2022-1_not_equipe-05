@@ -11,6 +11,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 using OpenTK.Input;
 using CG_Biblioteca;
+using CG_N2;
 
 namespace gcgcg
 {
@@ -48,13 +49,10 @@ namespace gcgcg
             Console.WriteLine(" --- Ajuda / Teclas: ");
             Console.WriteLine(" [  H     ] mostra teclas usadas. ");
 
-            // objetoId = Utilitario.charProximo(objetoId);
-            // obj_Retangulo = new Retangulo(objetoId, null, new Ponto4D(50, 50, 0), new Ponto4D(150, 150, 0));
-            // obj_Retangulo.ObjetoCor.CorR = 255; obj_Retangulo.ObjetoCor.CorG = 0; obj_Retangulo.ObjetoCor.CorB = 255;
-            // objetosLista.Add(obj_Retangulo);
+            //DesenharCirculo(new Ponto4D(0, 0), 100, Color.Yellow, 5);
 
-            // objetoSelecionado = obj_Retangulo;
-            DesenharCirculo(new Ponto4D(0, 0), 100, Color.Yellow, 5);
+            DesenharTrianguloECirculos();
+
 
 #if CG_Privado
       objetoId = Utilitario.charProximo(objetoId);
@@ -99,6 +97,28 @@ namespace gcgcg
             circulo.ObjetoCor.CorR = cor.R; circulo.ObjetoCor.CorG = cor.G; circulo.ObjetoCor.CorB = cor.B;
             circulo.PrimitivaTamanho = tamanho;
             objetosLista.Add(circulo);
+        }
+
+        private void DesenharTrianguloECirculos()
+        {
+            Ponto4D ponto1 = new Ponto4D(0, 100, 0);
+            Ponto4D ponto2 = new Ponto4D(-100, -100, 0);
+            Ponto4D ponto3 = new Ponto4D(100, -100, 0);
+
+            DesenharSegReta(ponto1, ponto2, Color.Cyan);
+            DesenharSegReta(ponto2, ponto3, Color.Cyan);
+            DesenharSegReta(ponto3, ponto1, Color.Cyan);
+
+            DesenharCirculo(ponto1, 100, Color.Black, 5);
+            DesenharCirculo(ponto2, 100, Color.Black, 5);
+            DesenharCirculo(ponto3, 100, Color.Black, 5);
+        }
+        private void DesenharSegReta(Ponto4D ponto1, Ponto4D ponto2, Color cor)
+        {
+            SegReta segReta1 = new SegReta(Convert.ToChar("C"), null, ponto1, ponto2);
+            segReta1.PrimitivaTamanho = 5;
+            segReta1.ObjetoCor.CorR = cor.R; segReta1.ObjetoCor.CorG = cor.G; segReta1.ObjetoCor.CorB = cor.B;
+            objetosLista.Add(segReta1);
         }
         protected override void OnKeyDown(OpenTK.Input.KeyboardKeyEventArgs e)
         {
