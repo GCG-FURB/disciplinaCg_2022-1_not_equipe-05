@@ -142,7 +142,7 @@ namespace gcgcg
             {
                 camera.ymin += 20;
                 camera.ymax += 20;
-            }
+            }//////
             else if (e.Key == Key.V)
                 mouseMoverPto = !mouseMoverPto;   //TODO: falta atualizar a BBox do objeto
             else

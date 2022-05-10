@@ -53,7 +53,6 @@ namespace gcgcg
 
             DesenharTrianguloECirculos();
 
-
 #if CG_Privado
       objetoId = Utilitario.charProximo(objetoId);
       obj_SegReta = new Privado_SegReta(objetoId, null, new Ponto4D(50, 150), new Ponto4D(150, 250));
@@ -98,7 +97,6 @@ namespace gcgcg
             circulo.PrimitivaTamanho = tamanho;
             objetosLista.Add(circulo);
         }
-
         private void DesenharTrianguloECirculos()
         {
             Ponto4D ponto1 = new Ponto4D(0, 100, 0);
@@ -120,22 +118,50 @@ namespace gcgcg
             segReta1.ObjetoCor.CorR = cor.R; segReta1.ObjetoCor.CorG = cor.G; segReta1.ObjetoCor.CorB = cor.B;
             objetosLista.Add(segReta1);
         }
+
         protected override void OnKeyDown(OpenTK.Input.KeyboardKeyEventArgs e)
         {
             if (e.Key == Key.H)
                 Utilitario.AjudaTeclado();
             else if (e.Key == Key.Escape)
                 Exit();
-            else if (e.Key == Key.E)
+            else if (e.Key == Key.O)
             {
-                Console.WriteLine("--- Objetos / Pontos: ");
-                for (var i = 0; i < objetosLista.Count; i++)
+                camera.xmin -= 100;
+                camera.xmax += 100;
+                camera.ymin -= 100;
+                camera.ymax += 100;
+            }
+            else if (e.Key == Key.I)
+            {
+                if ((camera.xmin + 100) != 0)
                 {
-                    Console.WriteLine(objetosLista[i]);
+                    camera.xmin += 100;
+                    camera.xmax -= 100;
+                    camera.ymin += 100;
+                    camera.ymax -= 100;
                 }
             }
-            else if (e.Key == Key.O)
-                bBoxDesenhar = !bBoxDesenhar;
+            else if (e.Key == Key.E)
+            {
+                camera.xmin += 20;
+                camera.xmax += 20;
+            }
+            else if (e.Key == Key.D)
+            {
+                camera.xmin -= 20;
+                camera.xmax -= 20;
+            }
+            else if (e.Key == Key.C)
+            {
+                camera.ymin -= 20;
+                camera.ymax -= 20;
+            }
+            else if (e.Key == Key.B)
+            {
+                camera.ymin += 20;
+                camera.ymax += 20;
+            }//////
             else if (e.Key == Key.V)
                 mouseMoverPto = !mouseMoverPto;   //TODO: falta atualizar a BBox do objeto
             else
@@ -171,11 +197,6 @@ namespace gcgcg
         }
 #endif
     }
-<<<<<<< HEAD
-#endif    
-  }
-   
-=======
     class Program
     {
         static void Main(string[] args)
@@ -185,5 +206,4 @@ namespace gcgcg
             window.Run(1.0 / 60.0);
         }
     }
->>>>>>> fd6129591c0d0d1fdc7fcca17f4de470988d0953
 }

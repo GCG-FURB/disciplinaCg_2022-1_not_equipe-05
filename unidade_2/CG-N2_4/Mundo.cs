@@ -27,7 +27,6 @@ namespace gcgcg
                 instanciaMundo = new Mundo(width, height);
             return instanciaMundo;
         }
-
         private CameraOrtho camera = new CameraOrtho();
         protected List<Objeto> objetosLista = new List<Objeto>();
         private ObjetoGeometria objetoSelecionado = null;
@@ -36,6 +35,21 @@ namespace gcgcg
         int mouseX, mouseY;   //TODO: achar método MouseDown para não ter variável Global
         private bool mouseMoverPto = false;
         private Retangulo obj_Retangulo;
+        private int indexListaTipos = 0;
+
+        private List<PrimitiveType> listaTipos = new List<PrimitiveType>()
+        {
+            PrimitiveType.Points,
+            PrimitiveType.Lines,
+            PrimitiveType.LineLoop,
+            PrimitiveType.LineStrip,
+            PrimitiveType.Triangles,
+            PrimitiveType.TriangleStrip,
+            PrimitiveType.TriangleFan,
+            PrimitiveType.Quads,
+            PrimitiveType.QuadStrip,
+            PrimitiveType.Polygon
+        };
 #if CG_Privado
     private Privado_SegReta obj_SegReta;
     private Privado_Circulo obj_Circulo;
@@ -51,7 +65,10 @@ namespace gcgcg
 
             //DesenharCirculo(new Ponto4D(0, 0), 100, Color.Yellow, 5);
 
-            DesenharTrianguloECirculos();
+            //DesenharTrianguloECirculos();
+
+            //DesenharRetanguloMudaFormaPrimitiva();
+
 
 
 #if CG_Privado
@@ -98,7 +115,6 @@ namespace gcgcg
             circulo.PrimitivaTamanho = tamanho;
             objetosLista.Add(circulo);
         }
-
         private void DesenharTrianguloECirculos()
         {
             Ponto4D ponto1 = new Ponto4D(0, 100, 0);
@@ -120,24 +136,83 @@ namespace gcgcg
             segReta1.ObjetoCor.CorR = cor.R; segReta1.ObjetoCor.CorG = cor.G; segReta1.ObjetoCor.CorB = cor.B;
             objetosLista.Add(segReta1);
         }
+        private void DesenharRetanguloMudaFormaPrimitiva()
+        {
+            obj_Retangulo = new Retangulo(Convert.ToChar("R"), null, new Ponto4D(200, 200, 0), new Ponto4D(-200, -200, 0));
+            obj_Retangulo.DefinirCorPonto(0, Color.MediumPurple);
+            obj_Retangulo.DefinirCorPonto(1, Color.Cyan);
+            obj_Retangulo.DefinirCorPonto(2, Color.Yellow);
+            obj_Retangulo.DefinirCorPonto(3, Color.Black);
+
+            obj_Retangulo.PrimitivaTamanho = 5;
+            obj_Retangulo.PrimitivaTipo = listaTipos[0];
+            objetosLista.Add(obj_Retangulo);
+            objetoSelecionado = obj_Retangulo;
+        }
+
         protected override void OnKeyDown(OpenTK.Input.KeyboardKeyEventArgs e)
         {
             if (e.Key == Key.H)
                 Utilitario.AjudaTeclado();
             else if (e.Key == Key.Escape)
                 Exit();
-            else if (e.Key == Key.E)
+            else if (e.Key == Key.O)
             {
-                Console.WriteLine("--- Objetos / Pontos: ");
-                for (var i = 0; i < objetosLista.Count; i++)
+                camera.xmin -= 100;
+                camera.xmax += 100;
+                camera.ymin -= 100;
+                camera.ymax += 100;
+            }
+            else if (e.Key == Key.I)
+            {
+                if ((camera.xmin + 100) != 0)
                 {
-                    Console.WriteLine(objetosLista[i]);
+                    camera.xmin += 100;
+                    camera.xmax -= 100;
+                    camera.ymin += 100;
+                    camera.ymax -= 100;
                 }
             }
-            else if (e.Key == Key.O)
-                bBoxDesenhar = !bBoxDesenhar;
+            else if (e.Key == Key.E)
+            {
+                camera.xmin += 20;
+                camera.xmax += 20;
+            }
+            else if (e.Key == Key.D)
+            {
+                camera.xmin -= 20;
+                camera.xmax -= 20;
+            }
+            else if (e.Key == Key.C)
+            {
+                camera.ymin -= 20;
+                camera.ymax -= 20;
+            }
+            else if (e.Key == Key.B)
+            {
+                camera.ymin += 20;
+                camera.ymax += 20;
+            }//////
             else if (e.Key == Key.V)
-                mouseMoverPto = !mouseMoverPto;   //TODO: falta atualizar a BBox do objeto
+                mouseMoverPto = !mouseMoverPto;
+            else if (e.Key == Key.Space) { 
+                if (obj_Retangulo == null)
+                    return;
+
+            if (indexListaTipos < listaTipos.Count - 1)
+            {
+                indexListaTipos++;
+            }
+            else
+            {
+                indexListaTipos = 0;
+            }
+
+            PrimitiveType tipo = listaTipos[indexListaTipos];
+
+            obj_Retangulo.PrimitivaTipo = tipo;
+            }
+            //TODO: falta atualizar a BBox do objeto
             else
                 Console.WriteLine(" __ Tecla não implementada.");
         }
@@ -171,11 +246,6 @@ namespace gcgcg
         }
 #endif
     }
-<<<<<<< HEAD
-#endif    
-  }
-   
-=======
     class Program
     {
         static void Main(string[] args)
@@ -185,5 +255,4 @@ namespace gcgcg
             window.Run(1.0 / 60.0);
         }
     }
->>>>>>> fd6129591c0d0d1fdc7fcca17f4de470988d0953
 }
