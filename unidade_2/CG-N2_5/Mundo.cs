@@ -235,35 +235,59 @@ namespace gcgcg
             }
             else if (e.Key == Key.Q)
             {
-                camera.xmin += 2;
-                camera.xmax += 2;
+                if (SrPalito == null)
+                    return;
+
+                SrPalito.Ponto1.X--;
+                SrPalito.Ponto2.X--;
             }
             else if (e.Key == Key.W)
             {
-                camera.xmin -= 2;
-                camera.xmax -= 2;
+                if (SrPalito == null)
+                    return;
+
+                SrPalito.Ponto1.X++;
+                SrPalito.Ponto2.X++;
             }
             else if (e.Key == Key.A)
             {
-                camera.xmin += 2;
-                camera.xmax -= 2;
-                camera.ymin += 2;
-                camera.ymax -= 2;
+                if (SrPalito == null)
+                    return;
+
+                RaioSrPalito--;
+                Ponto4D pontoFinal = PontoFinalBaseadoNoAngulo(SrPalito.Ponto1, AnguloSrPalito, RaioSrPalito);
+                SrPalito.Ponto2.X = pontoFinal.X;
+                SrPalito.Ponto2.Y = pontoFinal.Y;
             }
             else if (e.Key == Key.S)
             {
-                camera.xmin -= 2;
-                camera.xmax += 2;
-                camera.ymin -= 2;
-                camera.ymax += 2;
+                if (SrPalito == null)
+                    return;
+
+                RaioSrPalito++;
+                Ponto4D pontoFinal = PontoFinalBaseadoNoAngulo(SrPalito.Ponto1, AnguloSrPalito, RaioSrPalito);
+                SrPalito.Ponto2.X = pontoFinal.X;
+                SrPalito.Ponto2.Y = pontoFinal.Y;
             }
             else if (e.Key == Key.Z)
             {
-                camera.ZoomIn();
+                if (SrPalito == null)
+                    return;
+
+                AnguloSrPalito--;
+                Ponto4D pontoFinal = PontoFinalBaseadoNoAngulo(SrPalito.Ponto1, AnguloSrPalito, RaioSrPalito);
+                SrPalito.Ponto2.X = pontoFinal.X;
+                SrPalito.Ponto2.Y = pontoFinal.Y;
             }
             else if (e.Key == Key.X)
             {
-                camera.ZoomOut();
+                if (SrPalito == null)
+                    return;
+
+                AnguloSrPalito++;
+                Ponto4D pontoFinal = PontoFinalBaseadoNoAngulo(SrPalito.Ponto1, AnguloSrPalito, RaioSrPalito);
+                SrPalito.Ponto2.X = pontoFinal.X;
+                SrPalito.Ponto2.Y = pontoFinal.Y;
             }
             //TODO: falta atualizar a BBox do objeto
             else
