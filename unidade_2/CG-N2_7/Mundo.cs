@@ -41,6 +41,23 @@ namespace gcgcg
         private bool mouseMoverPto = false;
         private Retangulo obj_Retangulo;
         private int indexListaTipos = 0;
+        private Retangulo retanguloQueMuda;
+
+        private Ponto pontoSpline1;
+        private Ponto pontoSpline2;
+        private Ponto pontoSpline3;
+        private Ponto pontoSpline4;
+        private Ponto pontoSplineSelecionado;
+
+        private Spline spline;
+
+        public static Ponto4D pontoCentral = new Ponto4D(0, 0);
+        public static Ponto4D pontoDireitoSuperior = Matematica.GerarPtosCirculo(45, 300);
+        public static Ponto4D pontoEsquerdoSuperior = Matematica.GerarPtosCirculo(135, 300);
+        public static Ponto4D pontoEsquerdoInferior = Matematica.GerarPtosCirculo(225, 300);
+        public static Ponto4D pontoDireitoInferior = Matematica.GerarPtosCirculo(315, 300);
+        public static Cor corRetangulo = new Cor(252, 15, 192);
+        public static bool pegouCirculo = false;
 
         private List<PrimitiveType> listaTipos = new List<PrimitiveType>()
         {
@@ -64,6 +81,7 @@ namespace gcgcg
         {
             base.OnLoad(e);
             camera.xmin = -300; camera.xmax = 300; camera.ymin = -300; camera.ymax = 300;
+            //camera.xmin = -400; camera.xmax = 400; camera.ymin = -400; camera.ymax = 400;
 
             Console.WriteLine(" --- Ajuda / Teclas: ");
             Console.WriteLine(" [  H     ] mostra teclas usadas. ");
@@ -74,7 +92,11 @@ namespace gcgcg
 
             //DesenharRetanguloMudaFormaPrimitiva();
 
-            DesenharSenhorPalito();
+            //DesenharSenhorPalito();
+
+            //DesenharSpline();
+
+            DesenharBbox();
 
 
 
@@ -165,6 +187,68 @@ namespace gcgcg
             SrPalito.PrimitivaTamanho = 5;
             objetosLista.Add(SrPalito);
         }
+        private void DesenharSpline()
+        {
+            Ponto4D ponto1 = new Ponto4D(-200, -200);
+            Ponto4D ponto2 = new Ponto4D(-200, 200);
+            Ponto4D ponto3 = new Ponto4D(200, 200);
+            Ponto4D ponto4 = new Ponto4D(200, -200);
+
+            pontoSpline1 = new Ponto(Convert.ToChar("D"), null, ponto1);
+            pontoSpline2 = new Ponto(Convert.ToChar("E"), null, ponto2);
+            pontoSpline3 = new Ponto(Convert.ToChar("F"), null, ponto3);
+            pontoSpline4 = new Ponto(Convert.ToChar("G"), null, ponto4);
+            objetosLista.Add(pontoSpline1);
+            objetosLista.Add(pontoSpline2);
+            objetosLista.Add(pontoSpline3);
+            objetosLista.Add(pontoSpline4);
+
+            SegReta segReta1 = new SegReta(Convert.ToChar("A"), null, ponto1, ponto2);
+            segReta1.PrimitivaTamanho = 5;
+            segReta1.DefinirCorPonto(0, Color.Black);
+            segReta1.ObjetoCor.CorR = 224; segReta1.ObjetoCor.CorG = 255; segReta1.ObjetoCor.CorB = 255;
+            objetosLista.Add(segReta1);
+
+            SegReta segReta2 = new SegReta(Convert.ToChar("B"), null, ponto2, ponto3);
+            segReta2.PrimitivaTamanho = 5;
+            segReta2.ObjetoCor.CorR = 224; segReta2.ObjetoCor.CorG = 255; segReta2.ObjetoCor.CorB = 255;
+            objetosLista.Add(segReta2);
+
+            SegReta segReta3 = new SegReta(Convert.ToChar("C"), null, ponto3, ponto4);
+            segReta3.PrimitivaTamanho = 5;
+            segReta3.ObjetoCor.CorR = 224; segReta3.ObjetoCor.CorG = 255; segReta3.ObjetoCor.CorB = 255;
+            objetosLista.Add(segReta3);
+
+            spline = new Spline(Convert.ToChar("D"), null, ponto1, ponto2, ponto3, ponto4, 10);
+            spline.PrimitivaTamanho = 5;
+            spline.ObjetoCor.CorR = 255; spline.ObjetoCor.CorG = 255; spline.ObjetoCor.CorB = 0;
+            objetosLista.Add(spline);
+
+        }
+        private void DesenharBbox()
+        {
+
+            camera.xmax = 600;
+            camera.ymax = 600;
+            camera.xmin = -600;
+            camera.ymin = -600;
+
+            //Não podemos utilizar o mesmo ponto central
+
+            Retangulo retanguloMenor = new Retangulo(Convert.ToChar("M"), null, pontoEsquerdoInferior, pontoDireitoSuperior);
+            retanguloMenor.ObjetoCor = corRetangulo;
+            objetosLista.Add(retanguloMenor);
+
+            Ponto pontoCentral = new Ponto(Convert.ToChar("B"), null, Mundo.pontoCentral);
+            pontoCentral.PrimitivaTamanho = 5;
+            pontoCentral.ObjetoCor = new Cor(1, 1, 1);
+            objetosLista.Add(pontoCentral);
+
+            DesenharCirculo(new Ponto4D(0, 0), 300, Color.Black, 2, 720, PrimitiveType.LineLoop);
+            DesenharCirculo(Mundo.pontoCentral, 50, Color.Black, 2, primitivo: PrimitiveType.LineLoop);
+
+            //DesenharCirculo(new Ponto4D(0, 0), 300, new Color(0, 0, 0, 0), 1, 720);
+        }
         private Ponto4D PontoFinalBaseadoNoAngulo(Ponto4D ponto, int angulo, int raio)
         {
             Ponto4D pontoFinal = Matematica.GerarPtosCirculo(angulo, raio);
@@ -195,24 +279,44 @@ namespace gcgcg
             }
             else if (e.Key == Key.E)
             {
+                if (pontoSplineSelecionado != null)
+                {
+                    pontoSplineSelecionado.ponto.X--;
+                    return;
+                }
                 camera.xmin += 20;
                 camera.xmax += 20;
             }
             else if (e.Key == Key.D)
             {
+                if (pontoSplineSelecionado != null)
+                {
+                    pontoSplineSelecionado.ponto.X++;
+                    return;
+                }
                 camera.xmin -= 20;
                 camera.xmax -= 20;
             }
             else if (e.Key == Key.C)
             {
+                if (pontoSplineSelecionado != null)
+                {
+                    pontoSplineSelecionado.ponto.Y++;
+                    return;
+                }
                 camera.ymin -= 20;
                 camera.ymax -= 20;
             }
             else if (e.Key == Key.B)
             {
+                if (pontoSplineSelecionado != null)
+                {
+                    pontoSplineSelecionado.ponto.Y--;
+                    return;
+                }
                 camera.ymin += 20;
                 camera.ymax += 20;
-            }//////
+            }
             else if (e.Key == Key.V)
                 mouseMoverPto = !mouseMoverPto;
             else if (e.Key == Key.Space)
@@ -289,22 +393,134 @@ namespace gcgcg
                 SrPalito.Ponto2.X = pontoFinal.X;
                 SrPalito.Ponto2.Y = pontoFinal.Y;
             }
+            else if (e.Key == Key.KeypadPlus && spline != null)
+                spline.quantidadePontos++;
+            else if (e.Key == Key.KeypadSubtract && spline != null)
+            {
+                if (spline.quantidadePontos > 1)
+                    spline.quantidadePontos--;
+            }
+            else if (e.Key == Key.R && spline != null)
+                spline.quantidadePontos = 10;
+            else if (e.Key == Key.E)
+            {
+                Console.WriteLine("--- Objetos / Pontos: ");
+                for (int i = 0; i < objetosLista.Count; i++)
+                {
+                    Console.WriteLine(objetosLista[i]);
+                }
+            }
+            else if (e.Key == Key.Number1 || e.Key == Key.Keypad1)
+                SelecionarPonto(pontoSpline1);
+            else if (e.Key == Key.Number2 || e.Key == Key.Keypad2)
+                SelecionarPonto(pontoSpline2);
+            else if (e.Key == Key.Number3 || e.Key == Key.Keypad3)
+                SelecionarPonto(pontoSpline3);
+            else if (e.Key == Key.Number4 || e.Key == Key.Keypad4)
+                SelecionarPonto(pontoSpline4);
+            else if (e.Key == Key.Plus)
+            {
+                if (spline.quantidadePontos <= 100)
+                    spline.quantidadePontos++;
+            }
+            else if (e.Key == Key.Minus)
+            {
+                if (spline.quantidadePontos > 0)
+                {
+                    var proximoValor = spline.quantidadePontos - 1;
+                    if (proximoValor > 0)
+                    {
+                        spline.quantidadePontos = proximoValor;
+                    }
+                }
+
+            }
             //TODO: falta atualizar a BBox do objeto
             else
                 Console.WriteLine(" __ Tecla não implementada.");
         }
 
+        private void SelecionarPonto(Ponto ponto)
+        {
+            if (spline == null)
+            {
+                return;
+            }
+
+            pontoSpline1.cor = Color.Black;
+            pontoSpline2.cor = Color.Black;
+            pontoSpline3.cor = Color.Black;
+            pontoSpline4.cor = Color.Black;
+            ponto.cor = Color.Red;
+            pontoSplineSelecionado = ponto;
+        }
         //TODO: não está considerando o NDC
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
-            mouseX = e.Position.X; mouseY = 600 - e.Position.Y; // Inverti eixo Y
-            if (mouseMoverPto && (objetoSelecionado != null))
+            if (!e.Mouse.IsButtonDown(MouseButton.Left) || !pegouCirculo)
             {
-                objetoSelecionado.PontosUltimo().X = mouseX;
-                objetoSelecionado.PontosUltimo().Y = mouseY;
+                Mundo.pontoCentral.X = 0;
+                Mundo.pontoCentral.Y = 0;
+
+                return;
+            }
+
+            int x = (e.X - 300) * 2;
+            int y = (e.Y - 300) * -2;
+
+            if (Mundo.pontoDireitoInferior.X > x && Mundo.pontoDireitoInferior.Y < y &&
+                Mundo.pontoEsquerdoSuperior.X < x && Mundo.pontoEsquerdoSuperior.Y > y)
+            {
+                Mundo.pontoCentral.X = x;
+                Mundo.pontoCentral.Y = y;
+
+                corRetangulo.CorR = 252;
+                corRetangulo.CorG = 15;
+                corRetangulo.CorB = 192;
+            }
+            else
+            {
+                corRetangulo.CorR = 25;
+                corRetangulo.CorG = 140;
+                corRetangulo.CorB = 255;
+
+                // método euclidiano
+                // d = (x2 - x1)² + (y2 - y1)²
+                var d = (x * x) + (y * y);
+                var raioQuadrado = 300 * 300;
+
+                if (d < raioQuadrado)
+                {
+                    Mundo.pontoCentral.X = x;
+                    Mundo.pontoCentral.Y = y;
+                }
             }
         }
 
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            Mundo.pegouCirculo = false;
+            base.OnMouseUp(e);
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            if (e.IsPressed)
+            {
+                int x = (e.X - 300) * 2;
+                int y = (e.Y - 300) * -2;
+
+                Mundo.pegouCirculo = false;
+
+                if (x > (pontoCentral.X - 50) && x < (pontoCentral.X + 50) &&
+                    y < (pontoCentral.Y + 50) && y > (pontoCentral.Y - 50)
+                    )
+                {
+                    Mundo.pegouCirculo = true;
+                }
+            }
+            base.OnMouseDown(e);
+        }
 #if CG_Gizmo
         private void Sru3D()
         {
