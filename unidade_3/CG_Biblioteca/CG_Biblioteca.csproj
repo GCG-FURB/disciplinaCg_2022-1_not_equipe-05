@@ -6,15 +6,15 @@
 <!--    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DocumentationFile>bin\documentação.XML</DocumentationFile>-->
   </PropertyGroup>
-
-  <ItemGroup>
+    <ItemGroup>
   <!-- 
 MacOS
     <PackageReference Include="OpenTK" Version="3.2.0" />
 Windows
     <PackageReference Include="OpenTK.NetCore" Version="*" />
   -->
-    <PackageReference Include="OpenTK" Version="3.2.0" />
+     <PackageReference Include="OpenTK.NetCore" Version="*" />   
   </ItemGroup>
+
 
 </Project>

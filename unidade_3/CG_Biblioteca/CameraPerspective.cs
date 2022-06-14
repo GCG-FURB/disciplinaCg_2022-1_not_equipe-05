@@ -57,7 +57,7 @@ namespace CG_Biblioteca
       }
     }
 
-    public void MenuTecla(OpenTK.Input.Key tecla, char eixo, float deslocamento)
+    public void MenuTecla(Key tecla, char eixo, float deslocamento)
     {
       if (tecla == Key.P) Console.WriteLine(this);
       else if (tecla == Key.R)
