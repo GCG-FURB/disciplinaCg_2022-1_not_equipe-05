@@ -480,9 +480,9 @@ namespace gcgcg
             }
             else
             {
-                corRetangulo.CorR = 25;
-                corRetangulo.CorG = 140;
-                corRetangulo.CorB = 255;
+                corRetangulo.CorR = 255;
+                corRetangulo.CorG = 255;
+                corRetangulo.CorB = 0;
 
                 // método euclidiano
                 // d = (x2 - x1)² + (y2 - y1)²
@@ -493,6 +493,11 @@ namespace gcgcg
                 {
                     Mundo.pontoCentral.X = x;
                     Mundo.pontoCentral.Y = y;
+                } else
+                {
+                    corRetangulo.CorR = 0;
+                    corRetangulo.CorG = 0;
+                    corRetangulo.CorB = 255;
                 }
             }
         }
