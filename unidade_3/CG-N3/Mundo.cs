@@ -11,7 +11,6 @@ using OpenTK.Graphics.OpenGL;
 using System.Collections.Generic;
 using OpenTK.Input;
 using CG_Biblioteca;
-using CG_N3;
 
 namespace gcgcg
 {
@@ -33,24 +32,11 @@ namespace gcgcg
         private CameraOrtho camera = new CameraOrtho();
         protected List<Objeto> objetosLista = new List<Objeto>();
         private ObjetoGeometria objetoSelecionado = null;
+        private Ponto4D vertice = null;
         private char objetoId = '@';
         private bool bBoxDesenhar = false;
         int mouseX, mouseY;   //TODO: achar método MouseDown para não ter variável Global
-        private Poligono objetoNovo = null;
-
-        private List<PrimitiveType> listaTipos = new List<PrimitiveType>()
-        {
-            PrimitiveType.Points,
-            PrimitiveType.Lines,
-            PrimitiveType.LineLoop,
-            PrimitiveType.LineStrip,
-            PrimitiveType.Triangles,
-            PrimitiveType.TriangleStrip,
-            PrimitiveType.TriangleFan,
-            PrimitiveType.Quads,
-            PrimitiveType.QuadStrip,
-            PrimitiveType.Polygon
-        };
+        private Poligono poligono = null;
 #if CG_Privado
     private Privado_SegReta obj_SegReta;
     private Privado_Circulo obj_Circulo;
@@ -59,15 +45,16 @@ namespace gcgcg
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            camera.xmin = -300; camera.xmax = 300; camera.ymin = -300; camera.ymax = 300;
-            //camera.xmin = -400; camera.xmax = 400; camera.ymin = -400; camera.ymax = 400;
+            camera.xmin = -0; camera.xmax = 600; camera.ymin = -0; camera.ymax = 600;
 
             Console.WriteLine(" --- Ajuda / Teclas: ");
             Console.WriteLine(" [  H     ] mostra teclas usadas. ");
 
-
-
-
+            objetoId = Utilitario.charProximo(objetoId);
+            poligono = new Poligono(objetoId, null);
+            objetosLista.Add(poligono);
+            objetoSelecionado = poligono;
+            poligono = null;
 
 #if CG_Privado
       objetoId = Utilitario.charProximo(objetoId);
@@ -107,67 +94,185 @@ namespace gcgcg
             this.SwapBuffers();
         }
 
-
-        
-
-        private Ponto4D PontoFinalBaseadoNoAngulo(Ponto4D ponto, int angulo, int raio)
-        {
-            Ponto4D pontoFinal = Matematica.GerarPtosCirculo(angulo, raio);
-            return new Ponto4D(pontoFinal.X + ponto.X, pontoFinal.Y + ponto.Y, 0);
-        }
         protected override void OnKeyDown(OpenTK.Input.KeyboardKeyEventArgs e)
         {
             if (e.Key == Key.H)
                 Utilitario.AjudaTeclado();
             else if (e.Key == Key.Escape)
                 Exit();
-            else if (e.Key == Key.O)
-            {
-                camera.xmin -= 100;
-                camera.xmax += 100;
-                camera.ymin -= 100;
-                camera.ymax += 100;
-            }
-            else if (e.Key == Key.I)
-            {
-                if ((camera.xmin + 100) != 0)
-                {
-                    camera.xmin += 100;
-                    camera.xmax -= 100;
-                    camera.ymin += 100;
-                    camera.ymax -= 100;
-                }
-            }
-            else if (e.Key == Key.E)
-            {
-                camera.xmin += 20;
-                camera.xmax += 20;
-            }
-            else if (e.Key == Key.D)
-            {
-                camera.xmin -= 20;
-                camera.xmax -= 20;
-            }
-            else if (e.Key == Key.C)
-            {
-                camera.ymin -= 20;
-                camera.ymax -= 20;
-            }
-            else if (e.Key == Key.B)
-            {
-                camera.ymin += 20;
-                camera.ymax += 20;
-            }
-           
             else if (e.Key == Key.E)
             {
                 Console.WriteLine("--- Objetos / Pontos: ");
-                for (int i = 0; i < objetosLista.Count; i++)
+                for (var i = 0; i < objetosLista.Count; i++)
                 {
                     Console.WriteLine(objetosLista[i]);
                 }
             }
-            //TODO: falta atualizar a BBox do objeto
+            else if (e.Key == Key.O)
+                bBoxDesenhar = !bBoxDesenhar;
+            else if (e.Key == Key.Enter)
+            {
+                if (poligono != null)
+                {
+                    poligono.PontosRemoverUltimo();   
+                    objetoSelecionado = poligono;
+                    poligono = null;
+                }
+            }
+            else if (e.Key == Key.Space)
+            {
+                if (poligono == null)
+                {
+
+                    objetoId = Utilitario.charProximo(objetoId);
+                    poligono = new Poligono(objetoId, null);
+                    if (objetoSelecionado != null)
+                    {
+                        objetoSelecionado.FilhoAdicionar(poligono);
+                    }
+                    else
+                    {
+                        objetosLista.Add(poligono);
+                    }
+
+                    poligono.PontosAdicionar(new Ponto4D(mouseX, mouseY));
+                    poligono.PontosAdicionar(new Ponto4D(mouseX, mouseY));  
+                }
+                else
+                    poligono.PontosAdicionar(new Ponto4D(mouseX, mouseY));
+            }
+            else if (e.Key == Key.A)
+            {
+                // Seleciona o objeto onde o cursor esteja na boundbox
+                foreach (var objeto in objetosLista)
+                {
+                    if (mouseX > objeto.BBox.obterMenorX && mouseX < objeto.BBox.obterMaiorX)
+                    {
+                        if (mouseY > objeto.BBox.obterMenorY && mouseY < objeto.BBox.obterMaiorY)
+                        {
+                            var verificaObjeto = (ObjetoGeometria)objeto;
+                            bool clicouDentro = verificaObjeto.ScanLine(new Ponto4D(mouseX, mouseY));
+                            if (clicouDentro)
+                            {
+                                objetoSelecionado = (ObjetoGeometria)objeto;
+                            }
+                            else
+                            {
+                                objetoSelecionado = null;
+                            }
+                            return;
+                        }
+                    }
+                }
+                objetoSelecionado = null;
+            }
+            else if (objetoSelecionado != null)
+            {
+                if (e.Key == Key.M)
+                    Console.WriteLine(objetoSelecionado.Matriz);
+                else if (e.Key == Key.P)
+                    Console.WriteLine(objetoSelecionado);
+                else if (e.Key == Key.I)
+                    objetoSelecionado.AtribuirIdentidade();
+                //TODO: não está atualizando a BBox com as transformações geométricas
+                else if (e.Key == Key.Left)
+                    objetoSelecionado.TranslacaoXYZ(-10, 0, 0);
+                else if (e.Key == Key.Right)
+                    objetoSelecionado.TranslacaoXYZ(10, 0, 0);
+                else if (e.Key == Key.Up)
+                    objetoSelecionado.TranslacaoXYZ(0, 10, 0);
+                else if (e.Key == Key.Down)
+                    objetoSelecionado.TranslacaoXYZ(0, -10, 0);
+                else if (e.Key == Key.PageUp)
+                    objetoSelecionado.EscalaXYZ(2, 2, 2);
+                else if (e.Key == Key.PageDown)
+                    objetoSelecionado.EscalaXYZ(0.5, 0.5, 0.5);
+                else if (e.Key == Key.Home)
+                    objetoSelecionado.EscalaXYZBBox(0.5, 0.5, 0.5);
+                else if (e.Key == Key.End)
+                    objetoSelecionado.EscalaXYZBBox(2, 2, 2);
+                else if (e.Key == Key.Number1)
+                    objetoSelecionado.Rotacao(10);
+                else if (e.Key == Key.Number2)
+                    objetoSelecionado.Rotacao(-10);
+                else if (e.Key == Key.Number3)
+                    objetoSelecionado.RotacaoZBBox(10);
+                else if (e.Key == Key.Number4)
+                    objetoSelecionado.RotacaoZBBox(-10);
+                else if (e.Key == Key.Number9)
+                    objetoSelecionado = null;                     // desmacar objeto selecionado
+
+                else if (e.Key == Key.C)
+                {
+                    // Remove Objeto selecionado
+                    objetosLista.Remove(objetoSelecionado);
+                    var objetoOld = objetoSelecionado;
+                    // Seleciona o próximo objeto da lista
+                    if (objetosLista.Count > 0)
+                        objetoSelecionado = (ObjetoGeometria)objetosLista[objetosLista.Count - 1];
+                    objetoSelecionado.FilhoRemover(objetoOld);
+                }
+                else if (e.Key == Key.V)
+                // Seleciona vértice
+                {
+                    if (vertice == null)
+                    {
+                        vertice = objetoSelecionado.CalculaPontoProximo(new Ponto4D(mouseX, mouseY));
+                    }
+                    else
+                    {
+                        vertice = null;
+                    }
+
+                }
+                else if (e.Key == Key.D)
+                {
+                    // Remover vértice selecionado
+                    if (vertice != null)
+                    {
+                        objetoSelecionado.RemoverPonto(vertice);
+                    }
+                }
+                else if (e.Key == Key.S)
+                {
+                    // Altera a primitiva do polígono a ser desenhado para Aberto ou fechado
+                    if (poligono != null)
+                    {
+                        if (poligono.PrimitivaTipo == PrimitiveType.LineLoop)
+                        {
+                            poligono.PrimitivaTipo = PrimitiveType.LineStrip;
+                        }
+                        else
+                        {
+                            poligono.PrimitivaTipo = PrimitiveType.LineLoop;
+                        }
+                    }
+                }
+                else if (e.Key == Key.R)
+                {
+                    // Alter a cor do objeto selecionado para vemelho
+                    objetoSelecionado.ObjetoCor.CorR = 255;
+                    objetoSelecionado.ObjetoCor.CorG = 0;
+                    objetoSelecionado.ObjetoCor.CorB = 0;
+                }
+                else if (e.Key == Key.G)
+                {
+                    // Alter a cor do objeto selecionado para Verde
+                    objetoSelecionado.ObjetoCor.CorR = 0;
+                    objetoSelecionado.ObjetoCor.CorG = 255;
+                    objetoSelecionado.ObjetoCor.CorB = 0;
+                }
+                else if (e.Key == Key.B)
+                {
+                    // Alter a cor do objeto selecionado para Azul
+                    objetoSelecionado.ObjetoCor.CorR = 0;
+                    objetoSelecionado.ObjetoCor.CorG = 0;
+                    objetoSelecionado.ObjetoCor.CorB = 255;
+                }
+
+                else
+                    Console.WriteLine(" __ Tecla não implementada.");
+            }
             else
                 Console.WriteLine(" __ Tecla não implementada.");
         }
@@ -176,25 +281,23 @@ namespace gcgcg
         //TODO: não está considerando o NDC
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
-            
 
-            int x = (e.X - 300) * 2;
-            int y = (e.Y - 300) * -2;
-        }
-
-        protected override void OnMouseUp(MouseButtonEventArgs e)
-        {
-            base.OnMouseUp(e);
-        }
-
-        protected override void OnMouseDown(MouseButtonEventArgs e)
-        {
-            if (e.IsPressed)
+            mouseX = e.Position.X;
+            mouseY = 600 - e.Position.Y; // Inverti eixo Y
+            if (poligono != null)
             {
-                int x = (e.X - 300) * 2;
-                int y = (e.Y - 300) * -2;
+                poligono.PontosUltimo().X = mouseX;
+                poligono.PontosUltimo().Y = mouseY;
             }
-            base.OnMouseDown(e);
+            else
+            {
+                if (vertice != null)
+                {
+                    vertice.X = mouseX;
+                    vertice.Y = mouseY;
+                }
+
+            }
         }
 #if CG_Gizmo
         private void Sru3D()
