@@ -171,11 +171,6 @@ namespace gcgcg
         }
 #endif
     }
-<<<<<<< HEAD
-#endif    
-  }
-   
-=======
     class Program
     {
         static void Main(string[] args)
@@ -185,5 +180,4 @@ namespace gcgcg
             window.Run(1.0 / 60.0);
         }
     }
->>>>>>> fd6129591c0d0d1fdc7fcca17f4de470988d0953
 }

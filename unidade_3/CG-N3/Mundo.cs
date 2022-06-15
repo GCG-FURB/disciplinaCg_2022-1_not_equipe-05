@@ -10,148 +10,150 @@ using CG_Biblioteca;
 
 namespace gcgcg
 {
-  class Mundo : GameWindow
-  {
-    private static Mundo instanciaMundo = null;
-
-    private Mundo(int width, int height) : base(width, height) { }
-
-    public static Mundo GetInstance(int width, int height)
+    class Mundo : GameWindow
     {
-      if (instanciaMundo == null)
-        instanciaMundo = new Mundo(width, height);
-      return instanciaMundo;
-    }
+        private static Mundo instanciaMundo = null;
 
-    private CameraOrtho camera = new CameraOrtho();
-    protected List<Objeto> objetosLista = new List<Objeto>();
-    private ObjetoGeometria objetoSelecionado = null;
-    private Ponto4D verticeSelecionado = null;
-    private char objetoId = '@';
-    private bool bBoxDesenhar = false;
-    int mouseX, mouseY;   //TODO: achar método MouseDown para não ter variável Global
-    private Poligono objetoNovo = null;
+        private Mundo(int width, int height) : base(width, height) { }
+
+        public static Mundo GetInstance(int width, int height)
+        {
+            if (instanciaMundo == null)
+                instanciaMundo = new Mundo(width, height);
+            return instanciaMundo;
+        }
+
+        private CameraOrtho camera = new CameraOrtho();
+        protected List<Objeto> objetosLista = new List<Objeto>();
+        private ObjetoGeometria objetoSelecionado = null;
+        private Ponto4D verticeSelecionado = null;
+        private char objetoId = '@';
+        private bool bBoxDesenhar = false;
+        int mouseX, mouseY;   //TODO: achar método MouseDown para não ter variável Global
+        private Poligono objetoNovo = null;
 #if CG_Privado
     private Retangulo obj_Retangulo;
     private Privado_SegReta obj_SegReta;
     private Privado_Circulo obj_Circulo;
 #endif
 
-    protected override void OnLoad(EventArgs e)
-    {
-      base.OnLoad(e);
-      camera.xmin = 0; camera.xmax = 600; camera.ymin = 0; camera.ymax = 600;
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            camera.xmin = 0; camera.xmax = 600; camera.ymin = 0; camera.ymax = 600;
 
-      Console.WriteLine(" --- Ajuda / Teclas: ");
-      Console.WriteLine(" [  H     ] mostra teclas usadas. ");
+            Console.WriteLine(" --- Ajuda / Teclas: ");
+            Console.WriteLine(" [  H     ] mostra teclas usadas. ");
 
-      objetoId = Utilitario.charProximo(objetoId);
-      objetoNovo = new Poligono(objetoId, null);
-      objetosLista.Add(objetoNovo);
-      objetoNovo.PontosAdicionar(new Ponto4D(50, 350));
-      objetoNovo.PontosAdicionar(new Ponto4D(150, 350));  // N3-Exe6: "troque" para deixar o rastro
-      objetoNovo.PontosAdicionar(new Ponto4D(100, 450));
-      objetoSelecionado = objetoNovo;
-      objetoNovo = null;
+            objetoId = Utilitario.charProximo(objetoId);
+            objetoNovo = new Poligono(objetoId, null);
+            objetosLista.Add(objetoNovo);
+            objetoNovo.PontosAdicionar(new Ponto4D(50, 350));
+            objetoNovo.PontosAdicionar(new Ponto4D(150, 350));  // N3-Exe6: "troque" para deixar o rastro
+            objetoNovo.PontosAdicionar(new Ponto4D(100, 450));
+            objetoSelecionado = objetoNovo;
+            objetoNovo = null;
 
-      GL.ClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    }
+            GL.ClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        }
 
-    protected override void OnUpdateFrame(FrameEventArgs e)
-    {
-      base.OnUpdateFrame(e);
-      GL.MatrixMode(MatrixMode.Projection);
-      GL.LoadIdentity();
-      GL.Ortho(camera.xmin, camera.xmax, camera.ymin, camera.ymax, camera.zmin, camera.zmax);
-    }
-    protected override void OnRenderFrame(FrameEventArgs e)
-    {
-      base.OnRenderFrame(e);
-      GL.Clear(ClearBufferMask.ColorBufferBit);
-      GL.MatrixMode(MatrixMode.Modelview);
-      GL.LoadIdentity();
-#if CG_Gizmo      
-      Sru3D();
+        protected override void OnUpdateFrame(FrameEventArgs e)
+        {
+            base.OnUpdateFrame(e);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(camera.xmin, camera.xmax, camera.ymin, camera.ymax, camera.zmin, camera.zmax);
+        }
+        protected override void OnRenderFrame(FrameEventArgs e)
+        {
+            base.OnRenderFrame(e);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.LoadIdentity();
+#if CG_Gizmo
+            Sru3D();
 #endif
-      for (var i = 0; i < objetosLista.Count; i++)
-        objetosLista[i].Desenhar();
-      if (bBoxDesenhar && (objetoSelecionado != null))
-        objetoSelecionado.BBox.Desenhar();
-      this.SwapBuffers();
-    }
+            for (var i = 0; i < objetosLista.Count; i++)
+                objetosLista[i].Desenhar();
+            if (bBoxDesenhar && (objetoSelecionado != null))
+                objetoSelecionado.BBox.Desenhar();
+            this.SwapBuffers();
+        }
 
-    protected override void OnKeyDown(OpenTK.Input.KeyboardKeyEventArgs e)
-    {
-      if (e.Key == Key.H)
-        Utilitario.AjudaTeclado();
-      else if (e.Key == Key.Escape)
-        Exit();
-      else if (e.Key == Key.E)
-      {
-        Console.WriteLine("--- Objetos / Pontos: ");
-        for (var i = 0; i < objetosLista.Count; i++)
+        protected override void OnKeyDown(OpenTK.Input.KeyboardKeyEventArgs e)
         {
-          Console.WriteLine(objetosLista[i]);
-        }
-      }
-      else if (e.Key == Key.O)
-        bBoxDesenhar = !bBoxDesenhar;
-      else if (e.Key == Key.Enter)
-      {
-        if (objetoNovo != null)
-        {
-          objetoNovo.PontosRemoverUltimo();   // N3-Exe6: "truque" para deixar o rastro
-          objetoSelecionado = objetoNovo;
-          objetoNovo = null;
-        }
-      }
-      else if (e.Key == Key.Space)
-      {
-        if (objetoNovo == null)
-        {
-         
-          objetoId = Utilitario.charProximo(objetoId);
-          objetoNovo = new Poligono(objetoId, null);
-            if (objetoSelecionado != null)
+            if (e.Key == Key.H)
+                Utilitario.AjudaTeclado();
+            else if (e.Key == Key.Escape)
+                Exit();
+            else if (e.Key == Key.E)
             {
-              objetoSelecionado.FilhoAdicionar(objetoNovo);
-            } else
-            {
-                objetosLista.Add(objetoNovo);
-            }
-                       
-          objetoNovo.PontosAdicionar(new Ponto4D(mouseX, mouseY));
-          objetoNovo.PontosAdicionar(new Ponto4D(mouseX, mouseY));  // N3-Exe6: "troque" para deixar o rastro
-        }
-        else
-          objetoNovo.PontosAdicionar(new Ponto4D(mouseX, mouseY));
-      }
-      else if (e.Key == Key.A)
-       {
-        // Seleciona o objeto onde o cursor esteja na boundbox
-        foreach (var objeto in objetosLista)
-        {    
-            if (mouseX > objeto.BBox.obterMenorX && mouseX < objeto.BBox.obterMaiorX)
-            {
-                if (mouseY > objeto.BBox.obterMenorY && mouseY < objeto.BBox.obterMaiorY)
+                Console.WriteLine("--- Objetos / Pontos: ");
+                for (var i = 0; i < objetosLista.Count; i++)
                 {
-                    var verificaObjeto = (ObjetoGeometria)objeto;
-                    bool clicouDentro = verificaObjeto.ScanLine(new Ponto4D(mouseX, mouseY));
-                    if (clicouDentro)
-                    {
-                        objetoSelecionado = (ObjetoGeometria)objeto;
-                    } else
-                    {
-                       objetoSelecionado = null;
-                    }  
-                    return;
+                    Console.WriteLine(objetosLista[i]);
                 }
             }
-        }
-        objetoSelecionado = null;
-       }
-      else if (objetoSelecionado != null)
-      {
+            else if (e.Key == Key.O)
+                bBoxDesenhar = !bBoxDesenhar;
+            else if (e.Key == Key.Enter)
+            {
+                if (objetoNovo != null)
+                {
+                    objetoNovo.PontosRemoverUltimo();   // N3-Exe6: "truque" para deixar o rastro
+                    objetoSelecionado = objetoNovo;
+                    objetoNovo = null;
+                }
+            }
+            else if (e.Key == Key.Space)
+            {
+                if (objetoNovo == null)
+                {
+
+                    objetoId = Utilitario.charProximo(objetoId);
+                    objetoNovo = new Poligono(objetoId, null);
+                    if (objetoSelecionado != null)
+                    {
+                        objetoSelecionado.FilhoAdicionar(objetoNovo);
+                    }
+                    else
+                    {
+                        objetosLista.Add(objetoNovo);
+                    }
+
+                    objetoNovo.PontosAdicionar(new Ponto4D(mouseX, mouseY));
+                    objetoNovo.PontosAdicionar(new Ponto4D(mouseX, mouseY));  // N3-Exe6: "troque" para deixar o rastro
+                }
+                else
+                    objetoNovo.PontosAdicionar(new Ponto4D(mouseX, mouseY));
+            }
+            else if (e.Key == Key.A)
+            {
+                // Seleciona o objeto onde o cursor esteja na boundbox
+                foreach (var objeto in objetosLista)
+                {
+                    if (mouseX > objeto.BBox.obterMenorX && mouseX < objeto.BBox.obterMaiorX)
+                    {
+                        if (mouseY > objeto.BBox.obterMenorY && mouseY < objeto.BBox.obterMaiorY)
+                        {
+                            var verificaObjeto = (ObjetoGeometria)objeto;
+                            bool clicouDentro = verificaObjeto.ScanLine(new Ponto4D(mouseX, mouseY));
+                            if (clicouDentro)
+                            {
+                                objetoSelecionado = (ObjetoGeometria)objeto;
+                            }
+                            else
+                            {
+                                objetoSelecionado = null;
+                            }
+                            return;
+                        }
+                    }
+                }
+                objetoSelecionado = null;
+            }
+            else if (objetoSelecionado != null)
+            {
                 if (e.Key == Key.M)
                     Console.WriteLine(objetoSelecionado.Matriz);
                 else if (e.Key == Key.P)
@@ -185,7 +187,7 @@ namespace gcgcg
                     objetoSelecionado.RotacaoZBBox(-10);
                 else if (e.Key == Key.Number9)
                     objetoSelecionado = null;                     // desmacar objeto selecionado
-                
+
                 else if (e.Key == Key.C)
                 {
                     // Remove Objeto selecionado
@@ -193,19 +195,21 @@ namespace gcgcg
                     var objetoOld = objetoSelecionado;
                     // Seleciona o próximo objeto da lista
                     if (objetosLista.Count > 0)
-                    objetoSelecionado = (ObjetoGeometria)objetosLista[objetosLista.Count - 1];
+                        objetoSelecionado = (ObjetoGeometria)objetosLista[objetosLista.Count - 1];
                     objetoSelecionado.FilhoRemover(objetoOld);
-                } else if (e.Key == Key.V)
-                    // Seleciona vértice
+                }
+                else if (e.Key == Key.V)
+                // Seleciona vértice
                 {
                     if (verticeSelecionado == null)
                     {
                         verticeSelecionado = objetoSelecionado.CalculaPontoProximo(new Ponto4D(mouseX, mouseY));
-                    } else
+                    }
+                    else
                     {
                         verticeSelecionado = null;
                     }
-                    
+
                 }
                 else if (e.Key == Key.D)
                 {
@@ -228,7 +232,7 @@ namespace gcgcg
                         {
                             objetoNovo.PrimitivaTipo = PrimitiveType.LineLoop;
                         }
-                    }          
+                    }
                 }
                 else if (e.Key == Key.R)
                 {
@@ -251,60 +255,61 @@ namespace gcgcg
                     objetoSelecionado.ObjetoCor.CorG = 0;
                     objetoSelecionado.ObjetoCor.CorB = 255;
                 }
-                
+
                 else
                     Console.WriteLine(" __ Tecla não implementada.");
-      }
-      else
-        Console.WriteLine(" __ Tecla não implementada.");
-    }
+            }
+            else
+                Console.WriteLine(" __ Tecla não implementada.");
+        }
 
-    //TODO: não está considerando o NDC
-    protected override void OnMouseMove(MouseMoveEventArgs e)
-    {
-      mouseX = e.Position.X;
-      mouseY = 600 - e.Position.Y; // Inverti eixo Y
-      if (objetoNovo != null)
-      {
-        objetoNovo.PontosUltimo().X = mouseX;
-        objetoNovo.PontosUltimo().Y = mouseY;
-      } else
+        //TODO: não está considerando o NDC
+        protected override void OnMouseMove(MouseMoveEventArgs e)
+        {
+            mouseX = e.Position.X;
+            mouseY = 600 - e.Position.Y; // Inverti eixo Y
+            if (objetoNovo != null)
+            {
+                objetoNovo.PontosUltimo().X = mouseX;
+                objetoNovo.PontosUltimo().Y = mouseY;
+            }
+            else
             {
                 if (verticeSelecionado != null)
                 {
                     verticeSelecionado.X = mouseX;
                     verticeSelecionado.Y = mouseY;
                 }
-                    
+
             }
-    }
-        
+        }
+
 
 #if CG_Gizmo
-    private void Sru3D()
-    {
-      GL.LineWidth(1);
-      GL.Begin(PrimitiveType.Lines);
-      // GL.Color3(1.0f,0.0f,0.0f);
-      GL.Color3(Convert.ToByte(255), Convert.ToByte(0), Convert.ToByte(0));
-      GL.Vertex3(0, 0, 0); GL.Vertex3(200, 0, 0);
-      // GL.Color3(0.0f,1.0f,0.0f);
-      GL.Color3(Convert.ToByte(0), Convert.ToByte(255), Convert.ToByte(0));
-      GL.Vertex3(0, 0, 0); GL.Vertex3(0, 200, 0);
-      // GL.Color3(0.0f,0.0f,1.0f);
-      GL.Color3(Convert.ToByte(0), Convert.ToByte(0), Convert.ToByte(255));
-      GL.Vertex3(0, 0, 0); GL.Vertex3(0, 0, 200);
-      GL.End();
-    }
+        private void Sru3D()
+        {
+            GL.LineWidth(1);
+            GL.Begin(PrimitiveType.Lines);
+            // GL.Color3(1.0f,0.0f,0.0f);
+            GL.Color3(Convert.ToByte(255), Convert.ToByte(0), Convert.ToByte(0));
+            GL.Vertex3(0, 0, 0); GL.Vertex3(200, 0, 0);
+            // GL.Color3(0.0f,1.0f,0.0f);
+            GL.Color3(Convert.ToByte(0), Convert.ToByte(255), Convert.ToByte(0));
+            GL.Vertex3(0, 0, 0); GL.Vertex3(0, 200, 0);
+            // GL.Color3(0.0f,0.0f,1.0f);
+            GL.Color3(Convert.ToByte(0), Convert.ToByte(0), Convert.ToByte(255));
+            GL.Vertex3(0, 0, 0); GL.Vertex3(0, 0, 200);
+            GL.End();
+        }
 #endif
-  }
-  class Program
-  {
-    static void Main(string[] args)
-    {
-      Mundo window = Mundo.GetInstance(600, 600);
-      window.Title = "CG_N3";
-      window.Run(1.0 / 60.0);
     }
-  }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Mundo window = Mundo.GetInstance(600, 600);
+            window.Title = "CG_N3";
+            window.Run(1.0 / 60.0);
+        }
+    }
 }
