@@ -48,10 +48,7 @@ namespace gcgcg
             objetoId = Utilitario.charProximo(objetoId);
             objetoNovo = new Poligono(objetoId, null);
             objetosLista.Add(objetoNovo);
-            objetoNovo.PontosAdicionar(new Ponto4D(50, 350));
-            objetoNovo.PontosAdicionar(new Ponto4D(150, 350));  // N3-Exe6: "troque" para deixar o rastro
-            objetoNovo.PontosAdicionar(new Ponto4D(100, 450));
-            objetoSelecionado = objetoNovo;
+
             objetoNovo = null;
 
             GL.ClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -132,25 +129,18 @@ namespace gcgcg
                 // Seleciona o objeto onde o cursor esteja na boundbox
                 foreach (var objeto in objetosLista)
                 {
-                    if (mouseX > objeto.BBox.obterMenorX && mouseX < objeto.BBox.obterMaiorX)
+                    var verificaObjeto = (ObjetoGeometria)objeto;
+                    var clicouDentro = verificaObjeto.VerificarSeCoordenadaEstaDentro(new Ponto4D(mouseX, mouseY));
+                    if (clicouDentro.EstaDentro)
                     {
-                        if (mouseY > objeto.BBox.obterMenorY && mouseY < objeto.BBox.obterMaiorY)
-                        {
-                            var verificaObjeto = (ObjetoGeometria)objeto;
-                            bool clicouDentro = verificaObjeto.ScanLine(new Ponto4D(mouseX, mouseY));
-                            if (clicouDentro)
-                            {
-                                objetoSelecionado = (ObjetoGeometria)objeto;
-                            }
-                            else
-                            {
-                                objetoSelecionado = null;
-                            }
-                            return;
-                        }
+                        objetoSelecionado = clicouDentro.poligonoSelecionado;
+                        return;
+                    }
+                    else
+                    {
+                        objetoSelecionado = null;
                     }
                 }
-                objetoSelecionado = null;
             }
             else if (objetoSelecionado != null)
             {

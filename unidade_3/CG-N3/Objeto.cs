@@ -9,7 +9,7 @@ using CG_Biblioteca;
 namespace gcgcg
 {
     internal abstract class Objeto
-    {
+    { 
         protected char rotulo;
         private Cor objetoCor = new Cor(255, 255, 255, 255);
         public Cor ObjetoCor { get => objetoCor; set => objetoCor = value; }
@@ -37,7 +37,7 @@ namespace gcgcg
         {
             this.rotulo = rotulo;
         }
-
+        public IReadOnlyCollection<Objeto> ObterObjetosFilhos() => objetosLista.AsReadOnly();
         public void Desenhar()
         {
             GL.PushMatrix();                                    // N3-Exe14: grafo de cena
