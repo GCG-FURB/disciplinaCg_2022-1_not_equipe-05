@@ -212,15 +212,15 @@ namespace gcgcg
                 else if (e.Key == Key.S)
                 {
                     // Altera a primitiva do polígono a ser desenhado para Aberto ou fechado
-                    if (objetoNovo != null)
+                    if (objetoSelecionado != null)
                     {
-                        if (objetoNovo.PrimitivaTipo == PrimitiveType.LineLoop)
+                        if (objetoSelecionado.PrimitivaTipo == PrimitiveType.LineLoop)
                         {
-                            objetoNovo.PrimitivaTipo = PrimitiveType.LineStrip;
+                            objetoSelecionado.PrimitivaTipo = PrimitiveType.LineStrip;
                         }
                         else
                         {
-                            objetoNovo.PrimitivaTipo = PrimitiveType.LineLoop;
+                            objetoSelecionado.PrimitivaTipo = PrimitiveType.LineLoop;
                         }
                     }
                 }
