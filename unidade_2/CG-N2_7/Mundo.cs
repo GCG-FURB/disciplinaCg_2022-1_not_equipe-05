@@ -80,8 +80,8 @@ namespace gcgcg
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            camera.xmin = -300; camera.xmax = 300; camera.ymin = -300; camera.ymax = 300;
-            //camera.xmin = -400; camera.xmax = 400; camera.ymin = -400; camera.ymax = 400;
+            //camera.xmin = -300; camera.xmax = 300; camera.ymin = -300; camera.ymax = 300;
+            camera.xmin = -400; camera.xmax = 400; camera.ymin = -400; camera.ymax = 400;
 
             Console.WriteLine(" --- Ajuda / Teclas: ");
             Console.WriteLine(" [  H     ] mostra teclas usadas. ");
@@ -96,7 +96,7 @@ namespace gcgcg
 
             //DesenharSpline();
 
-            DesenharBbox();
+            //DesenharBbox();
 
 
 
@@ -196,6 +196,7 @@ namespace gcgcg
 
             pontoSpline1 = new Ponto(Convert.ToChar("D"), null, ponto1);
             pontoSpline2 = new Ponto(Convert.ToChar("E"), null, ponto2);
+            pontoSpline2 = new Ponto(Convert.ToChar("E"), null, ponto2);
             pontoSpline3 = new Ponto(Convert.ToChar("F"), null, ponto3);
             pontoSpline4 = new Ponto(Convert.ToChar("G"), null, ponto4);
             objetosLista.Add(pontoSpline1);
@@ -232,8 +233,6 @@ namespace gcgcg
             camera.ymax = 600;
             camera.xmin = -600;
             camera.ymin = -600;
-
-            //Não podemos utilizar o mesmo ponto central
 
             Retangulo retanguloMenor = new Retangulo(Convert.ToChar("M"), null, pontoEsquerdoInferior, pontoDireitoSuperior);
             retanguloMenor.ObjetoCor = corRetangulo;
