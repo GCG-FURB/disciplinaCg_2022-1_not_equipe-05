@@ -10,7 +10,7 @@ namespace gcgcg
 {
     internal abstract class Objeto
     { 
-        protected char rotulo;
+        public char rotulo;
         private Cor objetoCor = new Cor(255, 255, 255, 255);
         public Cor ObjetoCor { get => objetoCor; set => objetoCor = value; }
         private PrimitiveType primitivaTipo = PrimitiveType.LineLoop;
@@ -19,7 +19,7 @@ namespace gcgcg
         public float PrimitivaTamanho { get => primitivaTamanho; set => primitivaTamanho = value; }
         private BBox bBox = new BBox();
         public BBox BBox { get => bBox; set => bBox = value; }
-        private List<Objeto> objetosLista = new List<Objeto>();
+        private List<ObjetoGeometria> objetosLista = new List<ObjetoGeometria>();
 
         private Transformacao4D matriz = new Transformacao4D();
         public Transformacao4D Matriz { get => matriz; }
@@ -53,15 +53,15 @@ namespace gcgcg
             GL.PopMatrix();                                     // N3-Exe14: grafo de cena
         }
         protected abstract void DesenharGeometria();
-        public void FilhoAdicionar(Objeto filho)
+        public void FilhoAdicionar(ObjetoGeometria filho)
         {
             this.objetosLista.Add(filho);
         }
-        public void FilhoRemover(Objeto filho)
+        public void FilhoRemover(ObjetoGeometria filho)
         {
             this.objetosLista.Remove(filho);
         }
-        public List<Objeto> GetFilhos()
+        public List<ObjetoGeometria> GetFilhos()
         {
             return this.objetosLista;
         }
