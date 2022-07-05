@@ -25,7 +25,7 @@ namespace gcgcg
             return instanciaMundo;
         }
 
-        private CameraOrtho camera = new CameraOrtho();
+        private CameraPerspective camera = new CameraPerspective();
         public List<ObjetoGeometria> objetosLista = new List<ObjetoGeometria>();
         private Bloco objetoSelecionado = null;
         private char objetoId = '@';
@@ -35,7 +35,7 @@ namespace gcgcg
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            camera.xmin = 0; camera.xmax = 300; camera.ymin = 0; camera.ymax = 300;
+            camera.Fovy = 0; camera.Aspect = 300; camera.Near = 0; camera.Far = 300;
             GL.Enable(EnableCap.Texture2D);
             Console.WriteLine(" --- Ajuda / Teclas: ");
             Console.WriteLine(" [  H     ] mostra teclas usadas. ");
@@ -183,7 +183,7 @@ namespace gcgcg
             base.OnUpdateFrame(e);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(camera.xmin, camera.xmax, camera.ymin, camera.ymax, camera.zmin, camera.zmax);
+            GL.Ortho(camera.Fovy, camera.Aspect, camera.Near, camera.Far, -1, 1);
             ColocarBlocoAbaixo();
         }
         protected override void OnRenderFrame(FrameEventArgs e)

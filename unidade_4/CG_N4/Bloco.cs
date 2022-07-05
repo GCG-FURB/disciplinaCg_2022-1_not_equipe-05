@@ -4,7 +4,6 @@ using System.Linq;
 using CG_Biblioteca;
 using CG_N4;
 using gcgcg;
-using OpenTK.Graphics.OpenGL;
 
 namespace CG_N4
 {
@@ -144,7 +143,7 @@ namespace CG_N4
         /// </summary>
         /// <param name="x">Deslocamento em X</param>
         /// <param name="y">Deslocamento em Y</param>
-        public bool MoverObjeto(double x, double y, CameraOrtho camera, List<ObjetoGeometria> objetosMundo)
+        public bool MoverObjeto(double x, double y, CameraPerspective camera, List<ObjetoGeometria> objetosMundo)
         {
             if (this.movimentoValido(x, y, camera, objetosMundo))
             {
@@ -172,7 +171,7 @@ namespace CG_N4
         /// <summary>
         /// Função que define qual rotação será feita com base no tipo de bloco
         /// </summary>
-        public void Rotaciona(CameraOrtho camera)
+        public void Rotaciona(CameraPerspective camera)
         {
             switch (TipoBloco)
             {
@@ -205,9 +204,9 @@ namespace CG_N4
         /// <param name="pto">Pontos da rotação</param>
         /// <param name="camera">Câmera</param>
         /// <returns>true se é valida, false se não é</returns>
-        private bool RotacaoValida(Ponto4D pto, CameraOrtho camera)
+        private bool RotacaoValida(Ponto4D pto, CameraPerspective camera)
         {
-            if (pto.X > camera.xmax || pto.X < camera.xmin || pto.Y > camera.ymax || pto.Y < camera.ymin)
+            if (pto.X > camera.Aspect || pto.X < camera.Fovy || pto.Y > camera.Far || pto.Y < camera.Near)
                 return false;
             return true;
         }
@@ -231,7 +230,7 @@ namespace CG_N4
         /// <summary>
         /// Rotação do objeto T
         /// </summary>
-        private void RotacionaT(CameraOrtho camera)
+        private void RotacionaT(CameraPerspective camera)
         {
             var filhosRotuloBackup = this.GetFilhos().Select(filho => filho.rotulo).ToList();
             var filhosPontosBackup = this.GetFilhos().Select(filho => new List<Ponto4D>(filho.pontosLista)).ToList();
@@ -311,7 +310,7 @@ namespace CG_N4
         /// <summary>
         /// Rotação do objeto I
         /// </summary>
-        private void RotacionaI(CameraOrtho camera)
+        private void RotacionaI(CameraPerspective camera)
         {
             var filhosRotuloBackup = this.GetFilhos().Select(filho => filho.rotulo).ToList();
             var filhosPontosBackup = this.GetFilhos().Select(filho => new List<Ponto4D>(filho.pontosLista)).ToList();
@@ -436,7 +435,7 @@ namespace CG_N4
         /// <summary>
         /// Rotação do objeto Z
         /// </summary>
-        private void RotacionaZ(CameraOrtho camera)
+        private void RotacionaZ(CameraPerspective camera)
         {
             var filhosRotuloBackup = this.GetFilhos().Select(filho => filho.rotulo).ToList();
             var filhosPontosBackup = this.GetFilhos().Select(filho => new List<Ponto4D>(filho.pontosLista)).ToList();
@@ -531,7 +530,7 @@ namespace CG_N4
         /// <summary>
         /// Rotação do objeto L
         /// </summary>
-        private void RotacionaL(CameraOrtho camera)
+        private void RotacionaL(CameraPerspective camera)
         {
             var filhosRotuloBackup = this.GetFilhos().Select(filho => filho.rotulo).ToList();
             var filhosPontosBackup = this.GetFilhos().Select(filho => new List<Ponto4D>(filho.pontosLista)).ToList();
@@ -819,7 +818,7 @@ namespace CG_N4
         /// <summary>
         /// Rotação do objeto J
         /// </summary>
-        private void RotacionaJ(CameraOrtho camera)
+        private void RotacionaJ(CameraPerspective camera)
         {
             var filhosRotuloBackup = this.GetFilhos().Select(filho => filho.rotulo).ToList();
             var filhosPontosBackup = this.GetFilhos().Select(filho => new List<Ponto4D>(filho.pontosLista)).ToList();
@@ -1107,7 +1106,7 @@ namespace CG_N4
         /// <summary>
         /// Rotação do objeto S
         /// </summary>
-        private void RotacionaS(CameraOrtho camera)
+        private void RotacionaS(CameraPerspective camera)
         {
             var filhosRotuloBackup = this.GetFilhos().Select(filho => filho.rotulo).ToList();
             var filhosPontosBackup = this.GetFilhos().Select(filho => new List<Ponto4D>(filho.pontosLista)).ToList();
@@ -1350,7 +1349,7 @@ namespace CG_N4
             return false;
         }
 
-        private bool movimentoValido(double x, double y, CameraOrtho camera, List<ObjetoGeometria> objetosMundo)
+        private bool movimentoValido(double x, double y, CameraPerspective camera, List<ObjetoGeometria> objetosMundo)
         {
             if (VerificaSeHaColisao(x, y, objetosMundo))
             {
@@ -1359,7 +1358,7 @@ namespace CG_N4
 
             foreach (var pto in pontosLista)
             {
-                if (pto.X + x > camera.xmax || pto.X + x < camera.xmin || pto.Y + y > camera.ymax || pto.Y + y < camera.ymin)
+                if (pto.X + x > camera.Aspect || pto.X + x < camera.Fovy || pto.Y + y > camera.Far || pto.Y + y < camera.Near)
                 {
 
                     return false;
@@ -1370,7 +1369,7 @@ namespace CG_N4
             {
                 foreach (var pto in filho.pontosLista)
                 {
-                    if (pto.X + x > camera.xmax || pto.X + x < camera.xmin || pto.Y + y > camera.ymax || pto.Y + y < camera.ymin)
+                    if (pto.X + x > camera.Aspect || pto.X + x < camera.Fovy || pto.Y + y > camera.Far || pto.Y + y < camera.Near)
                     {
                         return false;
                     }
