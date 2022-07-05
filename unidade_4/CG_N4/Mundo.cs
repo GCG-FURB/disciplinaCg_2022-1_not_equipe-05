@@ -27,6 +27,7 @@ namespace gcgcg
 
         private CameraPerspective camera = new CameraPerspective();
         public List<ObjetoGeometria> objetosLista = new List<ObjetoGeometria>();
+        private DrawText drawtext = new DrawText();
         private Bloco objetoSelecionado = null;
         private char objetoId = '@';
         private bool bBoxDesenhar = false;
@@ -60,7 +61,6 @@ namespace gcgcg
             bloco = null;
 
         }
-
         protected void ColocarBlocoAbaixo()
         {
             if (objetoSelecionado != null && !objetoSelecionado.MoverObjeto(0, -30, camera, objetosLista))
@@ -68,6 +68,8 @@ namespace gcgcg
                 if (objetoSelecionado.pontosLista[0].X == 120 && objetoSelecionado.pontosLista[0].Y == 240)
                 {
                     objetoSelecionado = null;
+                    drawtext.AddText("Perdeu", System.Drawing.Color.Black, 300, 300, 300);
+                    GL.Disable(EnableCap.Texture2D);
                     return;
                 }
                 VerificaLinhaCompleta();
