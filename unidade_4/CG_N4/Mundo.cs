@@ -31,17 +31,12 @@ namespace gcgcg
         private char objetoId = '@';
         private bool bBoxDesenhar = false;
         private Bloco bloco;
-#if CG_Privado
-    private Retangulo obj_Retangulo;
-    private Privado_SegReta obj_SegReta;
-    private Privado_Circulo obj_Circulo;
-#endif
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
             camera.xmin = 0; camera.xmax = 300; camera.ymin = 0; camera.ymax = 300;
-
+            GL.Enable(EnableCap.Texture2D);
             Console.WriteLine(" --- Ajuda / Teclas: ");
             Console.WriteLine(" [  H     ] mostra teclas usadas. ");
 
@@ -88,6 +83,8 @@ namespace gcgcg
             {
                 var lineCount = 0;
 
+                //vai verificando os objetos e os filhos para ver se quase preencheu a linha
+
                 foreach (var objeto in objetosLista)
                 {
                     if (objeto.pontosLista.Count() > 0)
@@ -112,6 +109,7 @@ namespace gcgcg
                     }
                 }
 
+                //se cheogu em 10, é quase linha completa, então sobe mais uma linha no topo
                 if (lineCount == 10)
                 {
 
@@ -194,9 +192,6 @@ namespace gcgcg
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
-#if CG_Gizmo
-            Sru3D();
-#endif
             for (var i = 0; i < objetosLista.Count; i++)
                 objetosLista[i].Desenhar();
             if (bBoxDesenhar && (objetoSelecionado != null))
@@ -225,26 +220,7 @@ namespace gcgcg
             }
             else
                 Console.WriteLine(" __ Tecla não implementada.");
-    }
-
-
-#if CG_Gizmo
-        private void Sru3D()
-        {
-            GL.LineWidth(1);
-            GL.Begin(PrimitiveType.Lines);
-            // GL.Color3(1.0f,0.0f,0.0f);
-            GL.Color3(Convert.ToByte(255), Convert.ToByte(0), Convert.ToByte(0));
-            GL.Vertex3(0, 0, 0); GL.Vertex3(200, 0, 0);
-            // GL.Color3(0.0f,1.0f,0.0f);
-            GL.Color3(Convert.ToByte(0), Convert.ToByte(255), Convert.ToByte(0));
-            GL.Vertex3(0, 0, 0); GL.Vertex3(0, 200, 0);
-            // GL.Color3(0.0f,0.0f,1.0f);
-            GL.Color3(Convert.ToByte(0), Convert.ToByte(0), Convert.ToByte(255));
-            GL.Vertex3(0, 0, 0); GL.Vertex3(0, 0, 200);
-            GL.End();
         }
-#endif
     }
     class Program
     {
